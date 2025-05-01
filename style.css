@@ -15,7 +15,7 @@
 
 body { 
     /* padding: 20px;  */
-    background-image: url(./back.jpg);
+    background-image: url(back.jpg);
     background-size: cover;        /* Hace que la imagen cubra todo el fondo */
     background-repeat: no-repeat;  /* Evita que se repita */
     background-position: center;   /* Centra la imagen */
