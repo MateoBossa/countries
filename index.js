@@ -101,22 +101,26 @@ window.addEventListener("click", (e) => {
 let rondaActual = 1;
 let totalRondas = 15;
 let puntaje = 0;
-let paisesGlobales = [];
+const paisesPopulares = [
+  "Argentina", "Brasil", "Canadá", "China", "Colombia", "España", "Estados Unidos",
+  "Francia", "Alemania", "India", "Italia", "Japón", "México", "Perú", "Reino Unido",
+  "Rusia", "Corea del Sur", "Australia", "Chile", "Portugal"
+];
+
 
 function iniciarJuegoBandera() {
   rondaActual = 1;
   puntaje = 0;
 
   fetch("https://restcountries.com/v3.1/all")
-    .then(res => res.json())
-    .then(data => {
-      paisesGlobales = data;
-      mostrarRonda();
-    })
-    .catch(err => {
-      juegoContenedor.innerHTML = "<p>Error al cargar el juego.</p>";
-      console.error(err);
-    });
+  .then(res => res.json())
+  .then(data => {
+    // Filtrar solo los países populares
+    paisesGlobales = data.filter(p =>
+      paisesPopulares.includes(p.name.common)
+    );
+    mostrarRonda();
+  })
 }
 
 function mostrarRonda() {
