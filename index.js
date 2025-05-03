@@ -34,7 +34,7 @@ fetch(`https://restcountries.com/v3.1/name/${nombre}`)
     mostrarPaises(data); // Mostrar países encontrados
   })
   .catch(() => {
-    document.getElementById("resultado").innerHTML = `<p class="notfound">No se encontró el país "${nombre}".</p>`; // Mostrar mensaje de error si no se encuentra el país
+    document.getElementById("resultado").innerHTML = `<p class="notfound">No se encontró el país <strong>"${nombre.toUpperCase()}"</strong>.</p>`; // Mostrar mensaje de error si no se encuentra el país
   });
 }
 
@@ -53,6 +53,7 @@ paises.forEach((pais) => {
     <p class="capital"><strong>Capital:</strong> ${pais.capital}</p>
     <p class="region"><strong>Región:</strong> ${pais.region}</p>
     <p class="idioma"><strong>Idioma(s):</strong> ${pais.languages ? Object.values(pais.languages).join(", ") : 'N/A'}</p>
+    <a href="${pais.maps.googleMaps}" target="_blank">Ver en Google Maps</a>
   `;
   contenedor.appendChild(card);
   
