@@ -36,6 +36,15 @@ nav h1 {
     color: #fff;
     margin: 20px 0;
 }
+nav .content {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+}
+nav .content img {
+    width: 30px;
+}
 nav .inputbutton {
     /* background: lightcoral; */
     width: 100%;
@@ -75,6 +84,7 @@ nav .inputbutton button:active {
     padding: 15px 15px;
 }
 .pais .card { 
+    position: relative;
     background: #1f1e1e8f;
     backdrop-filter: blur(15px);
     border: 1px solid #ffffff84; 
@@ -118,9 +128,101 @@ nav .inputbutton button:active {
 .pais .card strong {
     font-weight: bold;
 }
+.pais .google-maps {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    border-radius: 50%;
+    height: 40px;
+    margin: 5px 5px;
+}
+.pais .google-maps .back-img {
+    position: absolute;
+    right: 8px;
+    top: 5px;
+    background: rgb(214, 214, 214);
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow:  0 4px 10px rgba(0, 0, 0, 0.4);
+}
+.pais .google-maps img {
+    width: 48px;
+    height: 25px;
+}
 .notfound {
     color: #fff;
     font-family: var(--font-family);
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+}
+.modal-contenido {
+    background-color: #1d1d1d;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    color: #fff;
+    position: relative;
+    text-align: center;
+}
+#cerrar-modal {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* JUEGO */
+.opciones {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: center;
+    gap: 15px;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+.opciones .opcion {
+    border: none;
+    width: auto;
+    padding: 5px 3px;
+    border-radius: 8px;
+    font-size: var(--font-poppins);
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 11px;
+    transition: 0.3s ease;
+}
+.opciones .opcion:active {
+    transform: scale(.95);
+}
+.end-game {
+    color: rgb(234, 67, 67);
+    font-family: var(--font-oswald);
+}
+#reiniciar-juego {
+    border: none;
+    margin: 10px;
+    width: 130px;
+    padding: 3px 5px;
+    font-family: var(--font-poppins);
+    border-radius: 5px;
 }
 
 @media (min-width: 768px) {

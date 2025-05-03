@@ -8,7 +8,10 @@
 </head>
 <body>
     <nav>
-        <h1>Buscar Países</h1>
+        <div class="content">
+            <h1>Buscar Países</h1>
+            <img src="game.svg" alt="menu">
+        </div>
         <div class="inputbutton">
             <input type="text" id="search" placeholder="Ej: España">
             <button onclick="buscarPais()">Buscar</button>
@@ -16,6 +19,17 @@
     </nav>
 
     <div class="pais" id="resultado"></div>
+    
+    <!-- Modal para el minijuego -->
+    <div id="modal-juego" class="modal">
+        <div class="modal-contenido">
+        <span id="cerrar-modal">&times;</span>
+        <h2>¿A qué país pertenece esta bandera?</h2>
+        <div id="juego-contenido">
+            <!-- Aquí se cargará el juego -->
+        </div>
+        </div>
+    </div>
 
     <script src="index.js"></script>
 </body>
