@@ -34,7 +34,7 @@ fetch(`https://restcountries.com/v3.1/name/${nombre}`)
     mostrarPaises(data); // Mostrar países encontrados
   })
   .catch(() => {
-    document.getElementById("resultado").innerHTML = `<p class="notfound">No se encontró el país.</p>`; // Mostrar mensaje de error si no se encuentra el país
+    document.getElementById("resultado").innerHTML = `<p class="notfound">No se encontró el país "${nombre}".</p>`; // Mostrar mensaje de error si no se encuentra el país
   });
 }
 
