@@ -68,7 +68,6 @@ paises.forEach((pais) => {
 });
 }
 
-
 // MODAL
 // Elementos del modal
 const modal = document.getElementById("modal-juego");
@@ -98,54 +97,74 @@ window.addEventListener("click", (e) => {
 
 
 // JUEGO
-let rondaActual = 1;
+let paisesRonda = [];
+let paisesDisponibles = [];
+let rondaActual = 0;
 let totalRondas = 15;
 let puntaje = 0;
-const paisesPopulares = [
-  "Argentina", "Brasil", "Canadá", "China", "Colombia", "España", "Estados Unidos",
-  "Francia", "Alemania", "India", "Italia", "Japón", "México", "Perú", "Reino Unido",
-  "Rusia", "Corea del Sur", "Australia", "Chile", "Portugal"
-];
-
 
 function iniciarJuegoBandera() {
-  rondaActual = 1;
-  puntaje = 0;
-
   fetch("https://restcountries.com/v3.1/all")
-  .then(res => res.json())
-  .then(data => {
-    // Filtrar solo los países populares
-    paisesGlobales = data.filter(p =>
-      paisesPopulares.includes(p.name.common)
-    );
-    mostrarRonda();
-  })
+    .then(res => res.json())
+    .then(data => {
+      const paisesPopulares = [
+        "Argentina", "Brazil", "Canada", "China", "Colombia", "Spain", "United States",
+        "France", "Germany", "India", "Italy", "Japan", "Mexico", "Peru", "United Kingdom",
+        "Russia", "South Korea", "Australia", "Chile", "Portugal"
+      ];
+
+      const paisesFiltrados = data.filter(p =>
+        paisesPopulares.includes(p.name.common)
+      );
+
+      // Eliminar duplicados
+      const paisesUnicos = [];
+      const nombresAgregados = new Set();
+      for (const pais of paisesFiltrados) {
+        if (!nombresAgregados.has(pais.name.common)) {
+          paisesUnicos.push(pais);
+          nombresAgregados.add(pais.name.common);
+        }
+      }
+
+      paisesDisponibles = paisesUnicos; // Guardamos todos los válidos
+
+      paisesRonda = mezclarArray(paisesUnicos).slice(0, 15);
+      rondaActual = 0;
+      puntaje = 0;
+      mostrarRonda();
+    });
 }
 
 function mostrarRonda() {
-  if (rondaActual > totalRondas) {
+  if (rondaActual >= paisesRonda.length || rondaActual >= totalRondas) {
     juegoContenedor.innerHTML = `
       <h3 class="end-game">Juego terminado</h3>
-      <p>Puntaje final: <strong>${puntaje} / ${totalRondas}</strong></p>
+      <p class="score">Puntaje final: <strong>${puntaje} / ${totalRondas}</strong></p>
       <button id="reiniciar-juego">Jugar de nuevo</button>
     `;
 
-    document.getElementById("reiniciar-juego").addEventListener("click", () => {
-      iniciarJuegoBandera();
-    });
-
+    document.getElementById("reiniciar-juego").addEventListener("click", iniciarJuegoBandera);
     return;
   }
 
-  const opciones = paisesGlobales.sort(() => 0.5 - Math.random()).slice(0, 4);
-  const respuestaCorrecta = opciones[Math.floor(Math.random() * opciones.length)];
+  const respuestaCorrecta = paisesRonda[rondaActual];
+
+  // Opciones incorrectas desde paisesDisponibles (excluyendo la correcta)
+  const opcionesIncorrectas = mezclarArray(
+    paisesDisponibles.filter(p => p.name.common !== respuestaCorrecta.name.common)
+  ).slice(0, 3);
+
+  const opciones = mezclarArray([...opcionesIncorrectas, respuestaCorrecta]);
 
   juegoContenedor.innerHTML = `
-    <p>Ronda ${rondaActual} de ${totalRondas}</p>
+    <p>Ronda ${rondaActual + 1} de ${totalRondas}</p>
     <img src="${respuestaCorrecta.flags.png}" alt="Bandera" style="width: 200px; margin: 20px auto;">
     <div class="opciones">
-      ${opciones.map(p => `<button class="opcion">${p.name.common}</button>`).join('')}
+      ${opciones
+        .filter(p => p && p.name && p.name.common) // <- prevención extra
+        .map(p => `<button class="opcion">${p.translations?.spa?.common || p.name.common}</button>`)
+        .join("")}
     </div>
     <p id="resultado-juego"></p>
   `;
@@ -153,19 +172,17 @@ function mostrarRonda() {
   document.querySelectorAll(".opcion").forEach(btn => {
     btn.addEventListener("click", () => {
       const resultado = document.getElementById("resultado-juego");
-      if (btn.textContent === respuestaCorrecta.name.common) {
+      if (btn.textContent === (respuestaCorrecta.translations?.spa?.common || respuestaCorrecta.name.common)) {
         resultado.textContent = "¡Correcto! 🎉";
         resultado.style.color = "lightgreen";
         puntaje++;
       } else {
-        resultado.textContent = `Incorrecto 😞. Era ${respuestaCorrecta.name.common}`;
+        resultado.textContent = `Incorrecto 😞. Era ${respuestaCorrecta.translations?.spa?.common || respuestaCorrecta.name.common}`;
         resultado.style.color = "tomato";
       }
 
-      // Desactivar botones
       document.querySelectorAll(".opcion").forEach(b => b.disabled = true);
 
-      // Esperar 1.5 segundos y cargar la siguiente ronda
       setTimeout(() => {
         rondaActual++;
         mostrarRonda();
@@ -173,4 +190,16 @@ function mostrarRonda() {
     });
   });
 }
+
+
+function mezclarArray(array) {
+  let copia = [...array];
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia;
+}
+
+
 

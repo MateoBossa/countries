@@ -190,6 +190,9 @@ nav .inputbutton button:active {
 }
 
 /* JUEGO */
+.img-game {
+    cursor: pointer;
+}
 .opciones {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -199,6 +202,7 @@ nav .inputbutton button:active {
     margin-bottom: 10px;
 }
 .opciones .opcion {
+    cursor: pointer;
     border: none;
     width: auto;
     padding: 5px 3px;
@@ -208,6 +212,10 @@ nav .inputbutton button:active {
     text-transform: uppercase;
     font-size: 11px;
     transition: 0.3s ease;
+}
+.score {
+    font-family: var(--font-oswald);
+    margin: 2px 2px;
 }
 .opciones .opcion:active {
     transform: scale(.95);
@@ -225,6 +233,7 @@ nav .inputbutton button:active {
     border-radius: 5px;
 }
 
+/* TABLETS */
 @media (min-width: 768px) {
     .pais { 
         grid-template-columns: repeat(3, 1fr);
@@ -236,8 +245,13 @@ nav .inputbutton button:active {
     .pais .card img {
         height: 90px; 
     }
+    .pais .google-maps img {
+        width: 48px;
+        height: 25px;
+    }
 }
 
+/* PC */
 @media (min-width: 1000px) {
     nav h1 {
         font-size: 2.5rem;
@@ -256,5 +270,9 @@ nav .inputbutton button:active {
     }
     .pais .card img {
         height: 100px; 
+    }
+    .pais .google-maps img {
+        width: 48px;
+        height: 25px;
     }
 }
