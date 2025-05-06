@@ -1,0 +1,98 @@
+@import url('style.css');
+
+/* BOTON ATRAS */
+.go-back {
+    display: flex;
+    width: 100%;
+    /* background: lightblue; */
+    height: 40px;
+    padding: 10px 5px;
+}
+.go-back button {
+    width: 50px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-family: var(--font-oswald);
+    font-size: 18px;
+    cursor: pointer;
+}
+.go-back .icon-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: -10px;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+/* DETALLES PAIS */
+#detalle-pais {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    /* background: lightblue; */
+    margin-top: 20px;
+    padding: 20px 15px;
+}
+#detalle-pais h2 {
+    font-family: var(--font-poppins);
+    font-size: 2rem;
+    color: #fff;
+    align-self: flex-start;
+    margin-left: 25px;
+    margin-bottom: 5px;
+}
+#detalle-pais p {
+    color: #fff;
+}
+#detalle-pais img {
+    width: 90%;
+}
+#informacion-pais {
+    margin-top: 15px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    background: rgba(231, 231, 231, 0.162);
+    padding: 10px 15px;
+    backdrop-filter: blur(5px);
+    width: 90%;
+    border-radius: 5px;
+    gap: 8px;
+}
+#informacion-pais p {
+    font-family: var(--font-poppins);
+    font-size: 13px;
+    text-overflow:ellipsis;
+}
+#imagenes-extras {
+    margin-top: 15px;
+    width: 90%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* background: lightblue; */
+}
+#imagenes-extras h3 {
+    font-family: var(--font-poppins);
+    color: #fff;
+    font-size: 2rem;
+    align-self: flex-start;
+}
+#imagenes-extras .imagenes {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* background-color: #fff; */
+    padding-top: 5px;
+    padding-left: 24px;
+}
+#imagenes-extras .imagene .field {
+    margin-top: 15px;
+    margin-left: 8px;
+}
+

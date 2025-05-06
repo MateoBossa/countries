@@ -232,6 +232,44 @@ nav .inputbutton button:active {
     font-family: var(--font-poppins);
     border-radius: 5px;
 }
+/* Animación para la respuesta correcta */
+@keyframes correcto {
+    0% {
+        transform: scale(1);
+        background-color: lightgreen;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        background-color: lightgreen;
+    }
+}
+  
+.correcto {
+    animation: correcto 0.5s ease-in-out;
+}
+  
+/* Animación para la respuesta incorrecta */
+@keyframes incorrecto {
+    0% {
+      transform: scale(1) rotate(0deg);
+      background-color: tomato;
+    }
+    50% {
+      transform: scale(1.1) rotate(-10deg);
+    }
+    100% {
+      transform: scale(1) rotate(0deg);
+      background-color: tomato;
+    }
+}
+  
+.incorrecto {
+    animation: incorrecto 0.5s ease-in-out;
+}
+  
 
 /* TABLETS */
 @media (min-width: 768px) {

@@ -40,32 +40,41 @@ fetch(`https://restcountries.com/v3.1/name/${nombre}`)
 
 // Mostrar la información de los países en las tarjetas
 function mostrarPaises(paises) {
-const contenedor = document.getElementById("resultado");
-contenedor.innerHTML = ""; // Limpiar el contenedor antes de agregar las nuevas tarjetas
+  const contenedor = document.getElementById("resultado");
+  contenedor.innerHTML = ""; // Limpiar el contenedor antes de agregar las nuevas tarjetas
 
-paises.forEach((pais) => {
-  const card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = `
-    <img src="${pais.flags.png}" alt="Bandera de ${pais.name.common}">
-    <h3>${pais.name.common}</h3>
-    <p class="poblacion"><strong>Población:</strong> ${pais.population.toLocaleString()}</p>
-    <p class="capital"><strong>Capital:</strong> ${pais.capital}</p>
-    <p class="region"><strong>Región:</strong> ${pais.region}</p>
-    <p class="idioma"><strong>Idioma(s):</strong> ${pais.languages ? Object.values(pais.languages).join(", ") : 'N/A'}</p>
-    <a class="google-maps" href="${pais.maps.googleMaps}" target="_blank">
-      <div class="back-img">
-        <img src="map.svg" alt="Google Maps">
-      </div>
-    </a>
-  `;
-  contenedor.appendChild(card);
-  
-  // Añadir la clase show para activar la animación
-  setTimeout(() => {
-    card.classList.add("show");
-  }, 50); // Añadir un pequeño retraso para que la animación se vea
-});
+  paises.forEach((pais) => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    // Envolver la tarjeta en un enlace para redirigir al detalle del país
+    const enlace = document.createElement("a");
+    enlace.href = `detalles.html?nombre=${encodeURIComponent(pais.name.common)}`;
+    enlace.classList.add("pais-enlace");  // Clase opcional para el enlace
+
+    card.innerHTML = `
+      <img src="${pais.flags.png}" alt="Bandera de ${pais.name.common}">
+      <h3>${pais.name.common}</h3>
+      <p class="poblacion"><strong>Población:</strong> ${pais.population.toLocaleString()}</p>
+      <p class="capital"><strong>Capital:</strong> ${pais.capital}</p>
+      <p class="region"><strong>Región:</strong> ${pais.region}</p>
+      <p class="idioma"><strong>Idioma(s):</strong> ${pais.languages ? Object.values(pais.languages).join(", ") : 'N/A'}</p>
+      <a class="google-maps" href="${pais.maps.googleMaps}" target="_blank">
+        <div class="back-img">
+          <img src="map.svg" alt="Google Maps">
+        </div>
+      </a>
+    `;
+
+    // Agregar el card al enlace
+    enlace.appendChild(card);
+    contenedor.appendChild(enlace);
+
+    // Añadir la clase show para activar la animación
+    setTimeout(() => {
+      card.classList.add("show");
+    }, 50); // Añadir un pequeño retraso para que la animación se vea
+  });
 }
 
 // MODAL
@@ -172,13 +181,20 @@ function mostrarRonda() {
   document.querySelectorAll(".opcion").forEach(btn => {
     btn.addEventListener("click", () => {
       const resultado = document.getElementById("resultado-juego");
+      
       if (btn.textContent === (respuestaCorrecta.translations?.spa?.common || respuestaCorrecta.name.common)) {
         resultado.textContent = "¡Correcto! 🎉";
         resultado.style.color = "lightgreen";
+        
+        // Añadir animación de respuesta correcta
+        btn.classList.add("correcto");
         puntaje++;
       } else {
         resultado.textContent = `Incorrecto 😞. Era ${respuestaCorrecta.translations?.spa?.common || respuestaCorrecta.name.common}`;
         resultado.style.color = "tomato";
+
+         // Añadir animación de respuesta incorrecta
+        btn.classList.add("incorrecto");
       }
 
       document.querySelectorAll(".opcion").forEach(b => b.disabled = true);
@@ -190,7 +206,6 @@ function mostrarRonda() {
     });
   });
 }
-
 
 function mezclarArray(array) {
   let copia = [...array];
