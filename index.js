@@ -1,3 +1,6 @@
+const puntajesPorContinente = {};  // Ej: { Asia: 12, Europe: 9 }
+let continenteActual = "";
+
 document.addEventListener("DOMContentLoaded", () => {
   obtenerTodosLosPaises(); // Cargar los primeros países cuando la página se carga
 
@@ -87,7 +90,24 @@ const juegoContenedor = document.getElementById("juego-contenido");
 // Mostrar modal al hacer clic en el ícono
 iconoMenu.addEventListener("click", () => {
   modal.style.display = "block";
-  iniciarJuegoBandera(); // Cargar el juego
+  juegoContenedor.innerHTML = `
+    <h3 class="text-cont">Selecciona un continente</h3>
+    <div class="continente-opciones">
+      <button data-cont="Africa">África</button>
+      <button data-cont="Americas">América</button>
+      <button data-cont="Asia">Asia</button>
+      <button data-cont="Europe">Europa</button>
+      <button data-cont="Oceania">Oceanía</button>
+    </div>
+  `;
+
+  // Escuchar los clics en los botones de continente
+  document.querySelectorAll(".continente-opciones button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const continenteSeleccionado = btn.getAttribute("data-cont");
+      iniciarJuegoBandera(continenteSeleccionado);
+    });
+  });
 });
 
 // Cerrar modal al hacer clic en la X
@@ -109,35 +129,29 @@ window.addEventListener("click", (e) => {
 let paisesRonda = [];
 let paisesDisponibles = [];
 let rondaActual = 0;
-let totalRondas = 15;
+let totalRondas = 5;
 let puntaje = 0;
 
-function iniciarJuegoBandera() {
+function iniciarJuegoBandera(continente) {
+  continenteActual = continente; // Guardar el continente actual
+
+
   fetch("https://restcountries.com/v3.1/all")
     .then(res => res.json())
     .then(data => {
-      const paisesPopulares = [
-        "Argentina", "Brazil", "Canada", "China", "Colombia", "Spain", "United States",
-        "France", "Germany", "India", "Italy", "Japan", "Mexico", "Peru", "United Kingdom",
-        "Russia", "South Korea", "Australia", "Chile", "Portugal"
-      ];
+      const paisesDelContinente = data.filter(p => p.region === continente);
 
-      const paisesFiltrados = data.filter(p =>
-        paisesPopulares.includes(p.name.common)
-      );
-
-      // Eliminar duplicados
-      const paisesUnicos = [];
+      // Eliminar duplicados por nombre común
       const nombresAgregados = new Set();
-      for (const pais of paisesFiltrados) {
-        if (!nombresAgregados.has(pais.name.common)) {
-          paisesUnicos.push(pais);
-          nombresAgregados.add(pais.name.common);
+      const paisesUnicos = paisesDelContinente.filter(p => {
+        if (!nombresAgregados.has(p.name.common)) {
+          nombresAgregados.add(p.name.common);
+          return true;
         }
-      }
+        return false;
+      });
 
-      paisesDisponibles = paisesUnicos; // Guardamos todos los válidos
-
+      paisesDisponibles = paisesUnicos;
       paisesRonda = mezclarArray(paisesUnicos).slice(0, 15);
       rondaActual = 0;
       puntaje = 0;
@@ -147,13 +161,44 @@ function iniciarJuegoBandera() {
 
 function mostrarRonda() {
   if (rondaActual >= paisesRonda.length || rondaActual >= totalRondas) {
+    // Guardar puntaje
+    puntajesPorContinente[continenteActual] = puntaje;
+  
+    // Mostrar fin del juego y opciones
     juegoContenedor.innerHTML = `
-      <h3 class="end-game">Juego terminado</h3>
+      <h3 class="end-game">Juego terminado - ${continenteActual}</h3>
       <p class="score">Puntaje final: <strong>${puntaje} / ${totalRondas}</strong></p>
-      <button id="reiniciar-juego">Jugar de nuevo</button>
+      <div class="botones-final">
+        <button id="jugar-nuevo">Elegir otro continente</button>
+        <button id="ver-estadisticas">Ver estadísticas</button>
+      </div>
     `;
-
-    document.getElementById("reiniciar-juego").addEventListener("click", iniciarJuegoBandera);
+  
+    // Volver a mostrar selector de continente
+    document.getElementById("jugar-nuevo").addEventListener("click", () => {
+      juegoContenedor.innerHTML = `
+        <h3 class="text-cont">Selecciona un continente</h3>
+        <div class="continente-opciones">
+          <button data-cont="Africa">África</button>
+          <button data-cont="Americas">América</button>
+          <button data-cont="Asia">Asia</button>
+          <button data-cont="Europe">Europa</button>
+          <button data-cont="Oceania">Oceanía</button>
+        </div>
+      `;
+      document.querySelectorAll(".continente-opciones button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const nuevoCont = btn.getAttribute("data-cont");
+          iniciarJuegoBandera(nuevoCont);
+        });
+      });
+    });
+  
+    // Ver estadísticas
+    document.getElementById("ver-estadisticas").addEventListener("click", () => {
+      mostrarEstadisticas();
+    });
+  
     return;
   }
 
@@ -206,6 +251,60 @@ function mostrarRonda() {
     });
   });
 }
+
+function mostrarEstadisticas() {
+  let html = `<h3 class="text-chart">Estadísticas por continente</h3><ul class="list-countries">`;
+  for (const cont in puntajesPorContinente) {
+    html += `<li class="name-country"><strong>${cont}:</strong> ${puntajesPorContinente[cont]} / ${totalRondas}</li>`;
+  }
+  html += `</ul><canvas id="graficoPuntajes" width="400" height="200"></canvas>
+           <button id="volver-inicio">Volver a jugar</button>`;
+
+  juegoContenedor.innerHTML = html;
+
+  document.getElementById("volver-inicio").addEventListener("click", () => {
+    iconoMenu.click(); // Simula volver a abrir el menú
+  });
+
+  dibujarGrafico();
+}
+
+function dibujarGrafico() {
+  const ctx = document.getElementById('graficoPuntajes').getContext('2d');
+  const labels = Object.keys(puntajesPorContinente);
+  const data = Object.values(puntajesPorContinente);
+
+  const colores = [
+    'rgba(255, 99, 132, 0.7)',   // África
+    'rgba(54, 162, 235, 0.7)',   // América
+    'rgba(255, 206, 86, 0.7)',   // Asia
+    'rgba(75, 192, 192, 0.7)',   // Europa
+    'rgba(153, 102, 255, 0.7)'   // Oceanía
+  ];
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Puntaje por continente',
+        data: data,
+        backgroundColor: colores,
+        borderColor: colores.map(color => color.replace('0.7', '1')), // Borde más opaco
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: totalRondas
+        }
+      }
+    }
+  });
+}
+
 
 function mezclarArray(array) {
   let copia = [...array];
