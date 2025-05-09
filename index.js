@@ -28,17 +28,28 @@ fetch("https://restcountries.com/v3.1/all")
 
 // Buscar un país por nombre
 function buscarPais(nombre) {
-fetch(`https://restcountries.com/v3.1/name/${nombre}`)
-  .then((res) => {
-    if (!res.ok) throw new Error("No encontrado");
-    return res.json();
-  })
-  .then((data) => {
-    mostrarPaises(data); // Mostrar países encontrados
-  })
-  .catch(() => {
-    document.getElementById("resultado").innerHTML = `<p class="notfound">No se encontró el país <strong>"${nombre.toUpperCase()}"</strong>.</p>`; // Mostrar mensaje de error si no se encuentra el país
-  });
+  fetch("https://restcountries.com/v3.1/all")
+    .then(res => res.json())
+    .then(data => {
+      // Convertir el texto de búsqueda a minúsculas para comparación
+      const nombreBusqueda = nombre.toLowerCase();
+
+      // Filtrar países cuyo nombre en español coincida con la búsqueda
+      const resultados = data.filter(pais => {
+        const nombreEspanol = pais.translations?.spa?.common?.toLowerCase();
+        return nombreEspanol?.includes(nombreBusqueda);
+      });
+
+      if (resultados.length > 0) {
+        mostrarPaises(resultados);
+      } else {
+        document.getElementById("resultado").innerHTML = `<p class="notfound">No se encontró el país <strong>"${nombre.toUpperCase()}"</strong>.</p>`;
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      document.getElementById("resultado").innerHTML = `<p class="notfound">Ocurrió un error al buscar el país.</p>`;
+    });
 }
 
 // Mostrar la información de los países en las tarjetas
@@ -50,18 +61,24 @@ function mostrarPaises(paises) {
     const card = document.createElement("div");
     card.className = "card";
 
+    // Obtener el nombre del país en español o el nombre común como respaldo
+    const nombreEspanol = pais.translations?.spa?.common || pais.name.common;
+
     // Envolver la tarjeta en un enlace para redirigir al detalle del país
     const enlace = document.createElement("a");
     enlace.href = `detalles.html?nombre=${encodeURIComponent(pais.name.common)}`;
-    enlace.classList.add("pais-enlace");  // Clase opcional para el enlace
+    enlace.classList.add("pais-enlace");
+
+    // Obtener idiomas como texto (mantienen su nombre nativo generalmente)
+    const idiomas = pais.languages ? Object.values(pais.languages).join(", ") : 'N/A';
 
     card.innerHTML = `
-      <img src="${pais.flags.png}" alt="Bandera de ${pais.name.common}">
-      <h3>${pais.name.common}</h3>
+      <img src="${pais.flags.png}" alt="Bandera de ${nombreEspanol}">
+      <h3>${nombreEspanol}</h3>
       <p class="poblacion"><strong>Población:</strong> ${pais.population.toLocaleString()}</p>
-      <p class="capital"><strong>Capital:</strong> ${pais.capital}</p>
+      <p class="capital"><strong>Capital:</strong> ${pais.capital || 'N/A'}</p>
       <p class="region"><strong>Región:</strong> ${pais.region}</p>
-      <p class="idioma"><strong>Idioma(s):</strong> ${pais.languages ? Object.values(pais.languages).join(", ") : 'N/A'}</p>
+      <p class="idioma"><strong>Idioma(s):</strong> ${idiomas}</p>
       <a class="google-maps" href="${pais.maps.googleMaps}" target="_blank">
         <div class="back-img">
           <img src="map.svg" alt="Google Maps">
@@ -69,14 +86,13 @@ function mostrarPaises(paises) {
       </a>
     `;
 
-    // Agregar el card al enlace
     enlace.appendChild(card);
     contenedor.appendChild(enlace);
 
     // Añadir la clase show para activar la animación
     setTimeout(() => {
       card.classList.add("show");
-    }, 50); // Añadir un pequeño retraso para que la animación se vea
+    }, 50);
   });
 }
 
@@ -304,7 +320,6 @@ function dibujarGrafico() {
     }
   });
 }
-
 
 function mezclarArray(array) {
   let copia = [...array];
