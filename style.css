@@ -194,6 +194,22 @@ nav .inputbutton button:active {
 }
 
 /* JUEGO */
+.two-games {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+.two-games button {
+    width: 220px;
+    border-radius: 10px;
+    padding: 5px 5px;
+    font-family: var(--font-poppins);
+    font-weight: bold;
+    font-size: 13px;
+}
+
 .title-game {
     font-family: var(--font-oswald);
     color: #fff;
@@ -209,7 +225,6 @@ nav .inputbutton button:active {
     grid-template-columns: repeat(2, 1fr);
     align-items: center;
     gap: 15px;
-    flex-direction: column;
     margin-bottom: 10px;
 }
 .opciones .opcion {
@@ -244,6 +259,22 @@ nav .inputbutton button:active {
     border-radius: 5px;
 }
 
+/* flecha volver */
+.volver {
+    margin: 10px 0;
+}
+.volver button {
+  background: none;
+  border: none;
+  color: #b5b5b5;
+  font-size: 16px;
+  cursor: pointer;
+}
+.volver button:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
 /* lista de continentes */
 ul {
     list-style: none;
@@ -274,15 +305,9 @@ ul .name-country {
     padding: 10px 20px;
     border-radius: 10px;
     border: none;
-    background-color: #0077ff;
-    color: white;
     cursor: pointer;
     font-size: 1rem;
-    transition: background-color 0.2s;
     font-family: var(--font-cal-sans);
-}
-.continente-opciones button:hover {
-    background-color: #005dc1;
 }
 .text-cont,
 .text-chart {
@@ -293,7 +318,93 @@ ul .name-country {
     text-align: center;
     margin-bottom: 10px;
 }
-  
+
+/* MEMORAMA */
+
+/* Estilo general del contenedor del juego */
+/* Contenedor principal */
+#memorama-contenido {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 100%;
+  margin: 0 auto;
+  padding: 5px 10px;
+  justify-items: center;
+}
+
+/* Estilo de cada carta */
+.carta {
+  width: 70px;
+  height: 100px;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.carta-interior {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+  position: relative; /* Necesario para posicionar las caras correctamente */
+}
+.carta.descubierta .carta-interior {
+  transform: rotateY(180deg);
+}
+/* Frente de la carta */
+.carta-frente,
+.carta-atras {
+  position: absolute; /* Hacen que ambas caras se solapen */
+  width: 100%;
+  height: 60%;
+  backface-visibility: hidden;
+  /* border-radius: 10px; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.carta-frente {
+  background-color: #ccc;
+  z-index: 2;
+}
+/* Atrás de la carta (la bandera) */
+.carta-atras {
+  transform: rotateY(180deg); /* Volteada */
+  background-color: rgba(255, 255, 255, 0.731);
+  backdrop-filter: blur(10px);
+}
+.carta img {
+  max-width: 95%;
+  max-height: 80%;
+}
+
+/* mensaje ganador */
+.mensaje-ganaste {
+  grid-column: span 4; /* Que ocupe todo el ancho */
+  text-align: center;
+  font-size: 1.5rem;
+  color: #fff;
+  background-color: #28a745;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 20px;
+  animation: fadeIn 1s ease forwards;
+}
+.oculto {
+  display: none;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+
 /* Animación para la respuesta correcta */
 @keyframes correcto {
     0% {

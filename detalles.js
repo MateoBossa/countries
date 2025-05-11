@@ -7,7 +7,7 @@ fetch(`https://restcountries.com/v3.1/name/${nombrePais}`)
     const pais = data[0];
 
     // Mostrar nombre y bandera
-    document.getElementById("nombre-pais").textContent = pais.name.official;
+    document.getElementById("nombre-pais").textContent = pais.translations?.spa?.official || pais.name.official;
     document.getElementById("bandera-pais").src = pais.flags.svg || pais.flags.png;
     document.getElementById("bandera-pais").alt = `Bandera de ${pais.name.common}`;
 
@@ -15,17 +15,17 @@ fetch(`https://restcountries.com/v3.1/name/${nombrePais}`)
     const idiomaTexto = pais.languages ? Object.values(pais.languages).join(", ") : 'N/A';
     const monedaObj = pais.currencies ? Object.values(pais.currencies)[0] : null;
     const monedaTexto = monedaObj ? `${monedaObj.name} (${monedaObj.symbol})` : 'N/A';
-    const gentilicio = pais.demonyms?.spa?.m || 'N/A';
+    const gentilicio = pais.demonyms?.spa?.m || pais.demonyms?.eng?.m;
     const fronteras = pais.borders ? pais.borders.join(", ") : 'Ninguna';
     const codLlamada = pais.idd?.root && pais.idd?.suffixes ? pais.idd.root + pais.idd.suffixes[0] : 'N/A';
 
     document.getElementById("informacion-pais").innerHTML = `
-      <p><strong>Nombre común:</strong> ${pais.name.common}</p>
+      <p><strong>Nombre común:</strong> ${pais.translations?.spa?.common || pais.name.common}</p>
       <p><strong>Gentilicio:</strong> ${gentilicio}</p>
       <p><strong>Población:</strong> ${pais.population.toLocaleString()}</p>
-      <p><strong>Capital:</strong> ${pais.capital}</p>
-      <p><strong>Región:</strong> ${pais.region}</p>
-      <p><strong>Subregión:</strong> ${pais.subregion}</p>
+      <p><strong>Capital:</strong> ${pais.capital?.join(", ") || "Desconocida"}</p>
+      <p><strong>Región:</strong> ${pais.translations?.spa?.region || pais.region}</p>
+      <p><strong>Subregión:</strong> ${pais.subregion || "No disponible"}</p>
       <p><strong>Idioma(s):</strong> ${idiomaTexto}</p>
       <p><strong>Área:</strong> ${pais.area.toLocaleString()} km²</p>
       <p><strong>Moneda:</strong> ${monedaTexto}</p>

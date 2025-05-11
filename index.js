@@ -21,7 +21,7 @@ function obtenerTodosLosPaises() {
 fetch("https://restcountries.com/v3.1/all")
   .then((res) => res.json())
   .then((data) => {
-      mostrarPaises(data.slice(0, 20)); // Solo los primeros 20 países
+      mostrarPaises(data.slice(0, 4)); // Solo los primeros 20 países
   })
   .catch((error) => console.error("Error:", error));
 }
@@ -103,10 +103,32 @@ const cerrarModal = document.getElementById("cerrar-modal");
 const iconoMenu = document.querySelector('.content img');
 const juegoContenedor = document.getElementById("juego-contenido");
 
-// Mostrar modal al hacer clic en el ícono
+// Modal para abrir los juegos
 iconoMenu.addEventListener("click", () => {
   modal.style.display = "block";
+  mostrarSeleccionDeJuegos(); // función para mostrar el menú principal de juegos
+});
+
+// seleccionar juego
+function mostrarSeleccionDeJuegos() {
   juegoContenedor.innerHTML = `
+    <h3 class="text-cont">Selecciona un juego</h3>
+    <div class="two-games">
+      <button id="juego-continentes">🌍Banderas por Continente</button>
+      <button id="juego-memorama">🧠Memorama</button>
+    </div>
+  `;
+
+  document.getElementById("juego-continentes").addEventListener("click", mostrarSeleccionContinentes);
+  document.getElementById("juego-memorama").addEventListener("click", mostrarJuegoMemorama);
+}
+
+// seleccionar los continentes
+function mostrarSeleccionContinentes() {
+  juegoContenedor.innerHTML = `
+    <div class="volver">
+      <button id="volver-menu">⬅ Volver</button>
+    </div>
     <h3 class="text-cont">Selecciona un continente</h3>
     <div class="continente-opciones">
       <button data-cont="Africa">África</button>
@@ -117,14 +139,140 @@ iconoMenu.addEventListener("click", () => {
     </div>
   `;
 
-  // Escuchar los clics en los botones de continente
+  document.getElementById("volver-menu").addEventListener("click", mostrarSeleccionDeJuegos);
+
   document.querySelectorAll(".continente-opciones button").forEach(btn => {
     btn.addEventListener("click", () => {
       const continenteSeleccionado = btn.getAttribute("data-cont");
       iniciarJuegoBandera(continenteSeleccionado);
     });
   });
-});
+}
+
+function mostrarJuegoMemorama() {
+  juegoContenedor.innerHTML = `
+    <div class="volver">
+      <button id="volver-menu">⬅ Volver</button>
+    </div>
+    <h3 class="text-cont">Memorama</h3>
+    <div id="memorama-contenido">
+      <!-- Aquí va el contenido dinámico del memorama -->
+    </div>
+
+    <div id="mensaje-ganaste" class="mensaje-ganaste oculto">
+      🎉 ¡Ganaste el juego de memorama!
+    </div>
+  `;
+
+  document.getElementById("volver-menu").addEventListener("click", mostrarSeleccionDeJuegos);
+
+  iniciarJuegoMemorama(); // Debes tener esta función definida
+}
+
+function obtenerAleatorio(array) {
+  const copia = [...array];
+  return copia[Math.floor(Math.random() * copia.length)];
+}
+
+async function iniciarJuegoMemorama() {
+  try {
+    const respuesta = await fetch("https://restcountries.com/v3.1/all");
+    const paises = await respuesta.json();
+
+    const continentes = {
+      Africa: [],
+      Americas: [],
+      Asia: [],
+      Europe: [],
+      Oceania: []
+    };
+
+    // Clasifica los países válidos por continente
+    paises.forEach(pais => {
+      const continente = pais.continents?.[0];
+      if (
+        continente &&
+        continentes[continente] &&
+        pais.flags?.png &&
+        pais.name?.common
+      ) {
+        continentes[continente].push({
+          nombre: pais.name.common,
+          imagen: pais.flags.png
+        });
+      }
+    });
+
+    const seleccionadas = [];
+    const continentesDisponibles = Object.keys(continentes);
+
+    // Selecciona hasta 6 países únicos de diferentes continentes (si hay)
+    while (seleccionadas.length < 6 && continentesDisponibles.length) {
+      const indice = Math.floor(Math.random() * continentesDisponibles.length);
+      const cont = continentesDisponibles.splice(indice, 1)[0];
+      const pais = obtenerAleatorio(continentes[cont]);
+      if (pais) seleccionadas.push(pais);
+    }
+
+    const cartas = [...seleccionadas, ...seleccionadas].sort(() => 0.5 - Math.random());
+
+    const contenedor = document.getElementById("memorama-contenido");
+    contenedor.innerHTML = "";
+    let primeraCarta = null;
+    let bloquear = false;
+    let aciertos = 0;
+
+    cartas.forEach((bandera) => {
+      const carta = document.createElement("div");
+      carta.className = "carta";
+      carta.dataset.nombre = bandera.nombre;
+
+      carta.innerHTML = `
+        <div class="carta-interior">
+          <div class="carta-frente">🎴</div>
+          <div class="carta-atras">
+            <img src="${bandera.imagen}" alt="${bandera.nombre}">
+          </div>
+        </div>
+      `;
+
+      carta.addEventListener("click", () => {
+        if (bloquear || carta.classList.contains("descubierta")) return;
+
+        carta.classList.add("descubierta");
+
+        if (!primeraCarta) {
+          primeraCarta = carta;
+        } else {
+          bloquear = true;
+          const segundaCarta = carta;
+
+          const iguales = primeraCarta.dataset.nombre === segundaCarta.dataset.nombre;
+          setTimeout(() => {
+            if (!iguales) {
+              primeraCarta.classList.remove("descubierta");
+              segundaCarta.classList.remove("descubierta");
+            } else {
+              aciertos += 1;
+              if (aciertos === seleccionadas.length) {
+                document.getElementById("mensaje-ganaste").classList.remove("oculto");
+              }
+            }
+            primeraCarta = null;
+            bloquear = false;
+          }, 800);
+        }
+      });
+
+      contenedor.appendChild(carta);
+    });
+
+  } catch (error) {
+    console.error("Error al obtener los países:", error);
+  }
+}
+
+
 
 // Cerrar modal al hacer clic en la X
 cerrarModal.addEventListener("click", () => {
@@ -195,11 +343,11 @@ function mostrarRonda() {
       juegoContenedor.innerHTML = `
         <h3 class="text-cont">Selecciona un continente</h3>
         <div class="continente-opciones">
-          <button data-cont="Africa">África</button>
-          <button data-cont="Americas">América</button>
-          <button data-cont="Asia">Asia</button>
-          <button data-cont="Europe">Europa</button>
-          <button data-cont="Oceania">Oceanía</button>
+          <button class="btn-africa" data-cont="Africa">África</button>
+          <button class="btn-america" data-cont="Americas">América</button>
+          <button class="btn-asia" data-cont="Asia">Asia</button>
+          <button class="btn-europa" data-cont="Europe">Europa</button>
+          <button class="btn-oceania" data-cont="Oceania">Oceanía</button>
         </div>
       `;
       document.querySelectorAll(".continente-opciones button").forEach(btn => {
@@ -329,6 +477,9 @@ function mezclarArray(array) {
   }
   return copia;
 }
+
+// 11/05/2025
+
 
 
 
